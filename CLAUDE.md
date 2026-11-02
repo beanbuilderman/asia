@@ -50,6 +50,6 @@ pnpm typecheck && pnpm lint && pnpm test
 - Database: Neon `asia-db` (free, London) via the Vercel marketplace. DataGrip: get the URL with `vercel env pull <tmpfile> --environment production` and use `DATABASE_URL_UNPOOLED`. Run migrations against it before a deploy that adds one.
 - Photos: Vercel Blob store `asia-media` (public, London).
 - Online logins: `~/Projects/asia/.admin_password_online`. Change one with `pnpm admin:password` and `DATABASE_URL` set to the Neon URL.
-- Email: `EMAIL_TRANSPORT=off` for now, so "forgotten password" sends nothing. To turn it on: the sender Asia <iamjoannarob@gmail.com> is verified in the PT with V Brevo account (2 November 2026); set `SMTP_HOST=smtp-relay.brevo.com`, `SMTP_PORT=587`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, and remove `EMAIL_TRANSPORT`.
+- Email: "forgotten password" emails send through the PT with V Brevo account (SMTP login bd21a7001@smtp-brevo.com, key stored as a sensitive Vercel value, separate key from ptwithv's). Sender: Asia <iamjoannarob@gmail.com>, verified in Brevo. Brevo shows it as iamjoannarob@12394919.brevosend.com because it is a Gmail address. Tested live on 2 November 2026: arrived in the inbox. If emails start landing in spam, authenticate asiajoannarob.com in Brevo (DNS records in Namecheap) and send from an @asiajoannarob.com address.
 
 Keep Next.js on 16.4.1 or later: 16.0.0 to 16.4.0 have critical remote code execution advisories (GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr).
