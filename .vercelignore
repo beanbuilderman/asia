@@ -1,0 +1,7 @@
+# Never upload local secrets or build output when deploying from this machine.
+.env*
+!.env.example
+node_modules
+.next
+.uploads
+legacy

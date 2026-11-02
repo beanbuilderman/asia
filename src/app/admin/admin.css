@@ -1,0 +1,130 @@
+/* Dashboard styles. Everything is scoped under .admin so it never touches the public site. */
+.admin {
+  --bg: #FAF8F5;
+  --panel: #FFFFFF;
+  --ink: #2A2A2A;
+  --dark: #1A1A1A;
+  --muted: #6E6964;
+  --accent: #8C7B6B;
+  --line: #E0D9D1;
+  --cream: #F5F0EB;
+  --bad: #9B2C2C;
+  --good: #2F5D3A;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-karla), "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.admin *, .admin *::before, .admin *::after { box-sizing: border-box; }
+.admin h1, .admin h2 { font-family: var(--font-cormorant), Georgia, serif; font-weight: 500; color: var(--dark); margin: 0 0 8px; }
+.admin h1 { font-size: 2rem; line-height: 1.2; }
+.admin h2 { font-size: 1.45rem; }
+.admin a { color: var(--dark); }
+.admin .muted { color: var(--muted); }
+.admin .small { font-size: 14px; }
+.admin .lead { margin: 0 0 24px; max-width: 640px; }
+.admin p { margin: 0 0 12px; }
+
+/* Top bar and tabs */
+.admin-top { background: var(--dark); color: #F5F0EB; position: sticky; top: 0; z-index: 20; }
+.admin-top .bar { max-width: 960px; margin: 0 auto; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.admin-top .logo { color: #F5F0EB; text-decoration: none; font-family: var(--font-cormorant), Georgia, serif; font-size: 1.25rem; letter-spacing: 0.04em; }
+.admin-tag { font-family: var(--font-karla), sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #B8ADA2; margin-left: 6px; }
+.admin-nav { max-width: 960px; margin: 0 auto; padding: 0 8px; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.admin-nav::-webkit-scrollbar { display: none; }
+.admin-nav a { color: #CFC6BD; text-decoration: none; padding: 12px 14px; min-height: 44px; white-space: nowrap; border-bottom: 3px solid transparent; font-size: 15px; }
+.admin-nav a[aria-current="page"] { color: #fff; border-bottom-color: var(--accent); }
+.admin-main { max-width: 960px; margin: 0 auto; padding: 28px 16px 120px; }
+
+/* Panels and forms */
+.admin .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.admin .editor-section { margin-bottom: 20px; }
+.admin .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; min-width: 0; }
+.admin label { font-weight: 500; font-size: 15px; }
+.admin input[type="text"], .admin input[type="email"], .admin input[type="password"], .admin textarea {
+  width: 100%; font: inherit; font-weight: 400; color: var(--ink); background: #fff;
+  border: 1px solid #CFC6BD; border-radius: 8px; padding: 10px 12px; min-height: 44px;
+}
+.admin textarea { resize: vertical; line-height: 1.55; }
+.admin input:focus, .admin textarea:focus, .admin button:focus-visible, .admin a:focus-visible, .admin summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.admin .hint { font-size: 13px; color: var(--muted); display: block; margin-bottom: 8px; }
+.admin .form-grid.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.admin .form-narrow { max-width: 420px; }
+.admin .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; margin: 4px 0 8px; cursor: pointer; }
+.admin .check input { width: 20px; height: 20px; margin: 0; flex: none; }
+
+/* Buttons */
+.admin .btn { font: inherit; font-weight: 500; background: var(--dark); color: #fff; border: 0; border-radius: 8px; padding: 12px 22px; min-height: 48px; cursor: pointer; }
+.admin .btn:disabled { opacity: 0.45; cursor: default; }
+.admin .btn-block { width: 100%; }
+.admin .mini-btn { font: inherit; font-size: 14px; background: #fff; color: var(--ink); border: 1px solid #CFC6BD; border-radius: 8px; padding: 8px 12px; min-height: 44px; min-width: 44px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.admin .mini-btn:disabled { opacity: 0.4; cursor: default; }
+.admin .mini-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.admin .mini-btn.danger { color: var(--bad); }
+.admin .mini-btn.ghost { background: transparent; color: #F5F0EB; border-color: #4A4643; }
+.admin .link-button { font: inherit; font-size: 14px; background: none; border: 0; padding: 8px 0; color: var(--muted); text-decoration: underline; cursor: pointer; min-height: 44px; }
+.admin .row-actions { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+
+/* Messages */
+.admin .flash { display: inline-block; font-size: 14px; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
+.admin .flash.bad { background: #FBEAEA; color: var(--bad); }
+.admin .flash.ok { background: #EAF3EC; color: var(--good); }
+
+/* Lists */
+.admin .editor-list { display: flex; flex-direction: column; gap: 12px; }
+.admin .editor-list > .mini-btn { align-self: flex-start; }
+.admin .editor-item { border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: var(--bg); }
+.admin details.editor-item { padding: 0; }
+.admin details.editor-item > summary { padding: 14px 16px; min-height: 48px; cursor: pointer; font-weight: 500; list-style-position: inside; }
+.admin details.editor-item[open] > summary { border-bottom: 1px solid var(--line); }
+.admin .editor-item-body { padding: 14px 16px; }
+.admin .editor-item-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.admin details .editor-item-head { justify-content: flex-end; }
+
+/* Photos */
+.admin .thumb { width: 180px; max-width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; border-radius: 6px; background: var(--cream); display: block; }
+.admin .photo-field { margin-bottom: 16px; }
+.admin .photo-field-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-top: 8px; }
+.admin .photo-field-row .upload { display: block; margin-bottom: 12px; }
+.admin .photo-grid { list-style: none; padding: 0; margin: 0 0 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.admin .photo-tile { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; min-width: 0; }
+.admin .photo-tile .thumb { width: 100%; }
+.admin .photo-num { display: block; font-size: 13px; color: var(--muted); margin-top: 6px; }
+.admin .photo-details { margin-top: 10px; }
+.admin .photo-details .field { margin-bottom: 8px; }
+
+/* Save bar */
+.admin .editor-savebar {
+  position: sticky; bottom: 0; z-index: 10; margin: 24px -16px 0; padding: 12px 16px;
+  background: rgba(250, 248, 245, 0.97); border-top: 1px solid var(--line);
+  display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+}
+.admin .savebar-msg { flex: 1; min-width: 200px; }
+
+/* Dashboard home */
+.admin .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.admin .card-link { text-decoration: none; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s; }
+.admin .card-link:hover { border-color: var(--accent); }
+.admin .card-link b { font-family: var(--font-cormorant), Georgia, serif; font-size: 1.4rem; font-weight: 500; }
+
+/* Sign in */
+.admin .auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+.admin .auth-inner { width: 100%; max-width: 400px; }
+.admin .auth-brand { font-family: var(--font-cormorant), Georgia, serif; font-size: 1.8rem; text-align: center; margin: 0; color: var(--dark); letter-spacing: 0.04em; }
+.admin .auth-sub { text-align: center; color: var(--muted); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 20px; }
+.admin .auth-back { text-align: center; margin-top: 16px; font-size: 14px; }
+
+@media (max-width: 640px) {
+  .admin .form-grid.two { grid-template-columns: 1fr; }
+  .admin h1 { font-size: 1.7rem; }
+  .admin .panel { padding: 16px; }
+  .admin .photo-grid { grid-template-columns: 1fr 1fr; }
+  .admin .photo-tile .row-actions .mini-btn { padding: 6px 8px; }
+}
+@media (max-width: 400px) {
+  .admin .photo-grid { grid-template-columns: 1fr; }
+}
