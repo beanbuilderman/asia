@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getContent, paragraphs } from "@/lib/content";
 import { Rich } from "@/components/Rich";
 import { Photo } from "@/components/Photo";
 import { TestimonialsCarousel } from "@/components/Carousels";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function AboutPage() {
   const { about, contact } = await getContent();
