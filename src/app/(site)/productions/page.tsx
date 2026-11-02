@@ -33,7 +33,7 @@ export default async function ProductionsPage() {
                 </CardCarousel>
               )}
               <div className="production-card__info">
-                <h3 className="production-card__title">{p.title}</h3>
+                <h2 className="production-card__title">{p.title}</h2>
                 {p.meta && <p className="production-card__meta">{p.meta}</p>}
                 {paragraphs(p.description).map((d, j) => (
                   <p className="production-card__desc" key={j}>
