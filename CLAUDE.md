@@ -43,8 +43,14 @@ pnpm typecheck && pnpm lint && pnpm test
 - Local uploads go to `.uploads/` (git-ignored) and are served by `src/app/uploads/[name]/route.ts`; online they go to Vercel Blob.
 - Photo filenames must be plain ASCII: macOS stores accented names decomposed, which 404s on Vercel's Linux.
 
-## Online (not set up yet)
+## Online
 
-Needs, like ptwithv: a Vercel project under `beanbuilderman`, a Neon database (run migrations against it before the first deploy, the build prerenders from it), a Blob store, and env vars `DATABASE_URL`, `AUTH_SECRET`, `SITE_URL=https://asiajoannarob.com`, `ALLOW_INDEXING=true` (only on the real domain), `BLOB_READ_WRITE_TOKEN`, and SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`) for reset emails. Then create the online logins with `pnpm admin:password` pointed at Neon, and move the domain's DNS from GitHub Pages to Vercel.
+- Vercel project `asia` (beanbuildermans-projects, Hobby, London). Production: https://asia-eosin.vercel.app, and asiajoannarob.com once Namecheap DNS points at Vercel (A @ 216.198.79.1 and 64.29.17.1, CNAME www aa2e8d68550a6353.vercel-dns-017.com.). Keep the Namecheap email forwarding records.
+- Deployed from the `cms` branch with `npx --cache /tmp/ptv-npm vercel deploy --prod --yes`. Back up `.env.local` first: `vercel link`, `integration add`, `blob create-store` and `env pull` rewrite it.
+- Database: Neon `asia-db` (free, London) via the Vercel marketplace. DataGrip: get the URL with `vercel env pull <tmpfile> --environment production` and use `DATABASE_URL_UNPOOLED`. Run migrations against it before a deploy that adds one.
+- Photos: Vercel Blob store `asia-media` (public, London).
+- Online logins: `~/Projects/asia/.admin_password_online`. Change one with `pnpm admin:password` and `DATABASE_URL` set to the Neon URL.
+- Email: `EMAIL_TRANSPORT=off` for now, so "forgotten password" sends nothing. To turn it on: add a Brevo sender for Asia in the PT with V Brevo account, set `SMTP_HOST=smtp-relay.brevo.com`, `SMTP_PORT=587`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, and remove `EMAIL_TRANSPORT`.
+- After the domain works: merge `cms` into `main`, turn off GitHub Pages, connect the repo in Vercel so pushes deploy.
 
 Keep Next.js on 16.4.1 or later: 16.0.0 to 16.4.0 have critical remote code execution advisories (GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr).
