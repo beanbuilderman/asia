@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, useCallback, useEffect, useRef, useState } from "react";
+import { Children, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 /** Photos in a carousel wait until they are needed. Fetch the next one in advance so it is ready when shown. */
 function usePreload(root: React.RefObject<HTMLDivElement | null>, index: number) {
@@ -10,6 +10,18 @@ function usePreload(root: React.RefObject<HTMLDivElement | null>, index: number)
   }, [root, index]);
   // Someone pointing at or touching the carousel is about to click through: fetch the rest.
   return () => root.current?.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((i) => (i.loading = "eager"));
+}
+
+/** True once the browser has finished loading the page (always false while the server renders). */
+function usePageLoaded() {
+  return useSyncExternalStore(
+    (onChange) => {
+      window.addEventListener("load", onChange);
+      return () => window.removeEventListener("load", onChange);
+    },
+    () => document.readyState === "complete",
+    () => false,
+  );
 }
 
 function useSlides(total: number) {
@@ -76,7 +88,13 @@ export function PhotoCarousel({
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  usePreload(root, index);
+  // Only the photo on screen and the next one are on the page at first. The hero stacks every photo in
+  // the same place, so the browser's own lazy loading would fetch all of them at once on arrival.
+  // The next one waits until the page has finished loading, so it does not slow down the first photo.
+  const [mounted, setMounted] = useState(() => new Set([0]));
+  const pageLoaded = usePageLoaded();
+  const wanted = pageLoaded ? [index, (index + 1) % Math.max(slides.length, 1)] : [index];
+  if (wanted.some((i) => !mounted.has(i))) setMounted(new Set([...mounted, ...wanted]));
   useEffect(() => {
     const onVis = () => setHidden(document.hidden);
     document.addEventListener("visibilitychange", onVis);
@@ -103,7 +121,7 @@ export function PhotoCarousel({
       <div className="carousel__track" style={hero ? undefined : { transform: `translateX(-${index * 100}%)` }}>
         {slides.map((s, i) => (
           <div className={`carousel__slide${i === index ? " is-active" : ""}`} key={i} aria-hidden={i !== index}>
-            {s}
+            {mounted.has(i) ? s : null}
           </div>
         ))}
       </div>

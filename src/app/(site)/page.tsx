@@ -6,6 +6,10 @@ import { PhotoCarousel, TestimonialsCarousel } from "@/components/Carousels";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
+// Full width, but a retina laptop gets the 2048px version instead of 3840px (a third of the download,
+// still sharp at that size). Phones and ordinary monitors are unaffected.
+const HERO_SIZES = "(min-resolution: 2dppx) and (min-width: 1024px) 1024px, 100vw";
+
 export default async function AboutPage() {
   const { about, contact } = await getContent();
   const base = process.env.SITE_URL ?? "https://asiajoannarob.com";
@@ -26,7 +30,7 @@ export default async function AboutPage() {
       {about.photos.length > 0 && (
         <PhotoCarousel label="Photos from my productions" variant="hero">
           {about.photos.map((img, i) => (
-            <Photo key={i} image={img} sizes="100vw" ratio={[3, 2]} priority={i === 0} fallbackAlt={`Production photo ${i + 1}`} />
+            <Photo key={i} image={img} sizes={HERO_SIZES} ratio={[3, 2]} priority={i === 0} fallbackAlt={`Production photo ${i + 1}`} />
           ))}
         </PhotoCarousel>
       )}
