@@ -69,28 +69,15 @@ export function CardCarousel({ label, children }: { label: string; children: Rea
   );
 }
 
-/**
- * Large photo carousel. Moves on every 5 seconds and pauses while someone points at it.
- * "page" sits at the top of the Education page and in blog posts; "hero" fills the width at the top
- * of the home page and fades between photos.
- */
-export function PhotoCarousel({
-  children,
-  label = "Photos",
-  variant = "page",
-}: {
-  children: React.ReactNode;
-  label?: string;
-  variant?: "page" | "hero";
-}) {
+/** Large photo carousel at the top of the Education page and in blog posts. Moves on every 5 seconds and pauses while someone points at it. */
+export function PhotoCarousel({ children, label = "Photos" }: { children: React.ReactNode; label?: string }) {
   const slides = Children.toArray(children);
   const { index, go } = useSlides(slides.length);
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  // Only the photo on screen and the next one are on the page at first. The hero stacks every photo in
-  // the same place, so the browser's own lazy loading would fetch all of them at once on arrival.
-  // The next one waits until the page has finished loading, so it does not slow down the first photo.
+  // Only the photo on screen is on the page at first, and the next one once the page has loaded,
+  // so the first photo downloads on its own.
   const [mounted, setMounted] = useState(() => new Set([0]));
   const pageLoaded = usePageLoaded();
   const wanted = pageLoaded ? [index, (index + 1) % Math.max(slides.length, 1)] : [index];
@@ -106,10 +93,9 @@ export function PhotoCarousel({
     return () => clearInterval(t);
   }, [paused, hidden, index, go, slides.length]);
   if (slides.length === 0) return null;
-  const hero = variant === "hero";
   return (
     <div
-      className={hero ? "carousel carousel--hero" : "carousel fade-in stagger-1"}
+      className="carousel fade-in stagger-1"
       ref={root}
       aria-roledescription="carousel"
       aria-label={label}
@@ -118,7 +104,7 @@ export function PhotoCarousel({
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div className="carousel__track" style={hero ? undefined : { transform: `translateX(-${index * 100}%)` }}>
+      <div className="carousel__track" style={{ transform: `translateX(-${index * 100}%)` }}>
         {slides.map((s, i) => (
           <div className={`carousel__slide${i === index ? " is-active" : ""}`} key={i} aria-hidden={i !== index}>
             {mounted.has(i) ? s : null}
@@ -221,5 +207,98 @@ export function TestimonialsCarousel({ children }: { children: React.ReactNode }
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Full-screen photo carousel at the top of the home page, with Asia's name over the photos.
+ * Swipe or tap the bars to move; it moves on by itself every 5 seconds (the bar fills as it goes)
+ * unless paused, hovered, hidden or the visitor prefers reduced motion.
+ */
+export function HeroCarousel({ children, caption, label, nextId }: { children: React.ReactNode; caption: React.ReactNode; label: string; nextId: string }) {
+  const slides = Children.toArray(children);
+  const { index, go } = useSlides(slides.length);
+  const [userPaused, setUserPaused] = useState(false);
+  const [hover, setHover] = useState(false);
+  const pageLoaded = usePageLoaded();
+  // Only the photo on screen is on the page at first, the next one once the page has loaded:
+  // every photo sits in the same place, so browser lazy loading would fetch them all at once.
+  const [mounted, setMounted] = useState(() => new Set([0]));
+  const wanted = pageLoaded ? [index, (index + 1) % Math.max(slides.length, 1)] : [index];
+  if (wanted.some((i) => !mounted.has(i))) setMounted(new Set([...mounted, ...wanted]));
+  const touchX = useRef<number | null>(null);
+  const many = slides.length > 1;
+  const running = many && !userPaused && !hover;
+
+  return (
+    <section
+      className="hero-photos"
+      aria-roledescription="carousel"
+      aria-label={label}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+      onTouchEnd={(e) => {
+        if (touchX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchX.current;
+        touchX.current = null;
+        if (Math.abs(dx) > 40) go(index + (dx < 0 ? 1 : -1));
+      }}
+    >
+      {slides.map((s, i) => (
+        <div className={`hero-photos__slide${i === index ? " is-active" : ""}`} key={i} aria-hidden={i !== index}>
+          {mounted.has(i) ? s : null}
+        </div>
+      ))}
+      <div className="hero-photos__shade" aria-hidden="true" />
+      <div className="hero-photos__caption">{caption}</div>
+      {many && (
+        <>
+          <button type="button" className="hero-photos__arrow hero-photos__arrow--prev" aria-label="Previous photo" onClick={() => go(index - 1)}>
+            &#8592;
+          </button>
+          <button type="button" className="hero-photos__arrow hero-photos__arrow--next" aria-label="Next photo" onClick={() => go(index + 1)}>
+            &#8594;
+          </button>
+          <div className="hero-photos__bar">
+            <button
+              type="button"
+              className="hero-photos__pause"
+              aria-label={userPaused ? "Play the photos" : "Pause the photos"}
+              aria-pressed={userPaused}
+              onClick={() => setUserPaused((p) => !p)}
+            >
+              {userPaused ? "▶" : "❚❚"}
+            </button>
+            <div className="hero-photos__progress">
+              {slides.map((_, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  className={`hero-photos__seg${i < index ? " done" : ""}`}
+                  aria-label={`Photo ${i + 1} of ${slides.length}`}
+                  aria-current={i === index ? "true" : undefined}
+                  onClick={() => go(i)}
+                >
+                  {i === index && (
+                    <span
+                      key={index}
+                      className="hero-photos__fill"
+                      style={{ animationPlayState: running ? "running" : "paused" }}
+                      onAnimationEnd={() => go(index + 1)}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+      <a href={`#${nextId}`} className="hero-photos__down" aria-label="Scroll down">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </a>
+    </section>
   );
 }

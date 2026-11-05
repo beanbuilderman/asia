@@ -34,8 +34,9 @@ Each page is one row in `site_content` (keys `site`, `about`, `productions`, `te
 
 - Home: big show-photo carousel at the top (fades every 5 seconds), then About, then testimonials. Training removed (it is in her CV). Pages saved before this keep their wording and get the default carousel through `.default()` in the schema.
 - Productions is now **Directing** at `/directing/`, Teaching is now **Education** at `/education/`; the old URLs redirect (next.config.ts). The section keys and dashboard URLs stay `productions` / `teaching`. Menu labels come from each page's heading.
-- **Blog**: one page, `/blog/`, every post with its own anchor (`/blog/#post-title`). Hidden from the menu and a 404 until the first post. One page instead of `/blog/[slug]` because Cache Components refuses an empty `generateStaticParams`.
+- **Blog** (rebuilt the same day the PT with V way): every post has its own page `/blog/<slug>`, list at `/blog/`. Posts live in one `site_content` row, key `posts` (`src/lib/posts.ts`, defaults in `src/content/posts.ts`). Dashboard: `/admin/blog/` list (reorder, Draft/Published badges), `new/`, `[slug]/` editor (`PostEditor.tsx`). Drafts: `published: false`, only visible at `/preview/blog/<slug>/` when signed in. The proxy answers 404 for drafts, unknown posts and `/blog/` until one post is published, and the menu hides Blog until then. The template post "Hello, I’m Asia" (from her bio, CVs and productions) ships as a draft: she rewrites and publishes it herself.
 - **Contact**: her photo, and CV buttons (Professional CV = her Directing CV, Academic CV). She replaces a CV by uploading a new PDF in the dashboard (`storePdf` in `src/lib/uploads.ts`, Blob path `cv/`). The Academic CV includes her phone number and postcode; Sonny chose to publish it as she sent it.
+- Home hero (rebuilt the same day after Sonny's mobile feedback): full-screen photos with her name and role on the first screen, menu bar see-through over them (`site-nav--over-photo`), swipe on phones, story-style progress bars, pause button, scroll chevron. Each photo has a "keep this part in view" choice (middle, top, left, right) because phones show only a slice of wide photos.
 - Speed: carousels only put the current photo on the page (plus the next one once the page has loaded), because the hero stacks every photo in one place and browser lazy loading would fetch all of them. Retina desktops get the 2048px hero, not 3840px (`HERO_SIZES` in the home page). Measured 5 Nov on a throttled phone: hero photo on screen at 0.8s, 261KB of images (all 11 photos and 887KB before the fix).
 - Fade-in uses `element.animate()`, not a class: React 19 reports any class or attribute change made before hydration.
 - Still to come from her: a new photo for Contact, an Instagram for photography (she can add it under Links), trimming marketing roles from Directing (her call, in the dashboard).
@@ -53,6 +54,10 @@ pnpm typecheck && pnpm lint && pnpm test
 - Logins: `pnpm admin:password <email> [name]` creates a login or sets a new password and prints it. Local passwords are in `~/Projects/asia/.admin_password`.
 - Local uploads go to `.uploads/` (git-ignored) and are served by `src/app/uploads/[name]/route.ts`; online they go to Vercel Blob.
 - Photo filenames must be plain ASCII: macOS stores accented names decomposed, which 404s on Vercel's Linux.
+
+### End-to-end tests (Playwright)
+
+`pnpm test:e2e` builds into `.next-e2e` and runs against `asia_e2e` (reset each run by `e2e/reset-db.ts`, login in `e2e/admin.ts`) on port 3400, with the installed Chrome. `site.spec.ts` runs at phone and desktop size and only reads; `dashboard.spec.ts` runs at phone size afterwards and changes things (publish, new post, photo focus, CV upload). Next keeps the page you just left mounted but hidden, so after a save that changes the address prefer role-based locators or `.filter({ visible: true })`.
 
 ## Online
 

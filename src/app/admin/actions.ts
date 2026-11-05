@@ -173,3 +173,65 @@ export async function actUploadPdf(fd: FormData): Promise<{ url?: string; error?
     return { error: "The PDF could not be uploaded. Please try again." };
   }
 }
+
+// ---------- Blog posts ----------
+
+export async function actSavePost(originalSlug: string | null, post: unknown): Promise<NonNullable<FormState> & { slug?: string }> {
+  await requireSession();
+  const { savePost, PostError } = await import("@/lib/posts");
+  try {
+    const saved = await savePost(originalSlug, post);
+    revalidatePath("/", "layout");
+    return {
+      ok: true,
+      message: saved.published ? "Saved. The post is live on your website." : "Saved as a draft. Only you can see it, in Preview.",
+      slug: saved.slug,
+    };
+  } catch (e) {
+    if (e instanceof PostError) return { error: e.message };
+    if (e instanceof z.ZodError) {
+      const issue = e.issues[0];
+      return { error: `${issue?.message ?? "Please check the form"} (${postFieldName(issue?.path ?? [])})` };
+    }
+    console.error("[save post]", e);
+    return { error: "Something went wrong and nothing was saved. Please try again." };
+  }
+}
+
+/** "sections > 1 > h2" -> "Section 2: heading", so Asia can find the field. */
+function postFieldName(path: PropertyKey[]): string {
+  const names: Record<string, string> = {
+    slug: "Web address", title: "Title on Google", description: "Description on Google", summary: "Short summary", date: "Date",
+    h1: "Heading", intro: "Introduction", h2: "heading", p: "text", list: "bullet points", image: "Photo", alt: "photo description",
+    url: "photo", quote: "Quote", name: "name",
+  };
+  const out: string[] = [];
+  for (let i = 0; i < path.length; i++) {
+    const k = path[i];
+    if (k === "sections" && typeof path[i + 1] === "number") out.push(`Section ${(path[++i] as number) + 1}`);
+    else if (typeof k === "number") continue;
+    else out.push(names[String(k)] ?? String(k));
+  }
+  return out.join(": ");
+}
+
+export async function actDeletePost(slug: string): Promise<FormState> {
+  await requireSession();
+  const { deletePost } = await import("@/lib/posts");
+  try {
+    await deletePost(slug);
+    revalidatePath("/", "layout");
+  } catch (e) {
+    console.error("[delete post]", e);
+    return { error: "Something went wrong. Please try again." };
+  }
+  redirect("/admin/blog/?deleted=1");
+}
+
+export async function actMovePost(slug: string, by: -1 | 1): Promise<void> {
+  await requireSession();
+  const { movePost } = await import("@/lib/posts");
+  await movePost(slug, by === -1 ? -1 : 1);
+  revalidatePath("/", "layout");
+}
+

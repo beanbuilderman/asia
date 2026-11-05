@@ -162,47 +162,6 @@ export function ContactForm({ initial, defaults }: Props<"contact">) {
   );
 }
 
-export function BlogForm({ initial, defaults }: Props<"blog">) {
-  return (
-    <SectionEditor sectionKey="blog" initial={initial} defaults={defaults} viewHref="/blog/">
-      <Panel title="Page heading">
-        <Text path={["heading"]} label="Heading" hint="Also the name of this page in the menu." />
-      </Panel>
-      <Panel
-        title="Posts"
-        intro="The Blog page and its menu link appear once you save your first post. Posts show newest first, in this order. A new post goes at the top."
-      >
-        <List
-          path={["posts"]}
-          label="Post"
-          max={200}
-          addAt="start"
-          addLabel="Write a new post"
-          blank={() => ({
-            title: "",
-            date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
-            photos: [],
-            body: "",
-          })}
-          summary={(p) => [String(p.title || "New post"), String(p.date ?? "")].filter(Boolean).join(" · ")}
-          render={(i) => (
-            <>
-              <Text path={["posts", i, "title"]} label="Title" hint={ITALICS} />
-              <Text path={["posts", i, "date"]} label="Date shown (optional)" />
-              <Text path={["posts", i, "body"]} label="Your post" area rows={14} hint={`${PARAGRAPHS} ${ITALICS}`} />
-              <b className="small">Photos (optional)</b>
-              <p className="hint" style={{ marginTop: 0 }}>
-                One photo shows above the post. Two or more become a carousel.
-              </p>
-              <PhotoList path={["posts", i, "photos"]} max={10} />
-            </>
-          )}
-        />
-      </Panel>
-    </SectionEditor>
-  );
-}
-
 export function SiteForm({ initial, defaults }: Props<"site">) {
   return (
     <SectionEditor sectionKey="site" initial={initial} defaults={defaults} viewHref="/">

@@ -894,6 +894,8 @@ img {
 /* Images keep the look of the original <img> tags when rendered through next/image. */
 .hero__image, .production-card__image, .card-carousel__slide img, .carousel__slide img { height: auto; }
 .img-top { object-position: top; }
+.img-left { object-position: 20% center; }
+.img-right { object-position: 80% center; }
 
 /* Carousel arrows and the menu button must be reachable by keyboard users too. */
 .card-carousel:focus-within .card-carousel__btn { opacity: 1; }
@@ -904,48 +906,174 @@ img {
 
 .contact-content .contact-text { white-space: pre-line; }
 
-/* ---- HOME: big rotating show photos at the top (added 5 November 2026) ---- */
+/* ---- HOME: full-screen show photos with her name (5 November 2026) ---- */
 
-.carousel--hero {
-  max-width: none;
-  padding: 0;
-  margin-top: 5rem; /* clears the fixed menu bar */
-  height: min(calc(100svh - 5rem), 66.67vw);
-  min-height: 260px;
-  background: var(--cream);
+.hero-photos {
+  position: relative;
+  height: 100svh;
+  min-height: 480px;
+  overflow: hidden;
+  background: var(--soft-black);
+  color: var(--warm-white);
+  touch-action: pan-y;
 }
-.carousel--hero .carousel__track { height: 100%; position: relative; }
-.carousel--hero .carousel__slide {
+.hero-photos__slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+.hero-photos__slide.is-active { opacity: 1; }
+.hero-photos__slide img { width: 100%; height: 100%; object-fit: cover; }
+/* Darker at the top (menu) and bottom (name, controls) so white text reads on any photo. */
+.hero-photos__shade {
   position: absolute;
   inset: 0;
-  min-width: 0;
-  padding: 0;
-  opacity: 0;
-  transition: opacity 1.4s ease;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(26, 26, 26, 0.45) 0%, rgba(26, 26, 26, 0) 22%),
+    linear-gradient(to top, rgba(26, 26, 26, 0.75) 0%, rgba(26, 26, 26, 0.35) 30%, rgba(26, 26, 26, 0) 55%);
 }
-.carousel--hero .carousel__slide.is-active { opacity: 1; }
-.carousel--hero .carousel__slide img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }
-.carousel--hero .carousel__btn { opacity: 0; transition: opacity 0.3s ease, background 0.3s ease; }
-.carousel--hero:hover .carousel__btn,
-.carousel--hero:focus-within .carousel__btn { opacity: 1; }
-.carousel--hero .carousel__btn--prev { left: 1rem; }
-.carousel--hero .carousel__btn--next { right: 1rem; }
-.carousel--hero .carousel__dots {
+.hero-photos__caption {
+  position: absolute;
+  left: 3rem;
+  right: 3rem;
+  bottom: 7.5rem;
+  max-width: 900px;
+}
+.hero-photos__name {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 24px rgba(0, 0, 0, 0.25);
+}
+.hero-photos__role {
+  margin-top: 0.9rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.hero-photos__bar {
+  position: absolute;
+  left: 3rem;
+  right: 3rem;
+  bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2;
+}
+.hero-photos__pause {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(250, 248, 245, 0.6);
+  background: rgba(26, 26, 26, 0.25);
+  color: var(--warm-white);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.hero-photos__progress { flex: 1; display: flex; gap: 6px; max-width: 420px; }
+.hero-photos__seg {
+  flex: 1;
+  height: 24px; /* easy to tap; the visible line is the ::before */
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  position: relative;
+}
+.hero-photos__seg::before,
+.hero-photos__fill {
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 1.2rem;
-  margin: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: rgba(250, 248, 245, 0.35);
+}
+.hero-photos__seg.done::before { background: rgba(250, 248, 245, 0.9); }
+.hero-photos__fill {
+  background: var(--warm-white);
+  transform-origin: left;
+  animation: hero-fill 5s linear forwards;
+}
+@keyframes hero-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-photos__fill { animation: none; transform: scaleX(1); }
+  .hero-photos__slide { transition: none; }
+}
+.hero-photos__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(250, 248, 245, 0.5);
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.2);
+  color: var(--warm-white);
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.3s ease;
   z-index: 2;
 }
-.carousel--hero .carousel__dot { border-color: rgba(250, 248, 245, 0.9); background: rgba(26, 26, 26, 0.15); }
-.carousel--hero .carousel__dot.active { background: var(--warm-white); border-color: var(--warm-white); }
-.hero--after-carousel { min-height: auto; padding-top: 6rem; }
-@media (hover: none) { .carousel--hero .carousel__btn { opacity: 1; } }
-@media (max-width: 768px) {
-  .carousel--hero { margin-top: 4.3rem; height: 66.67vw; }
-  .hero--after-carousel { padding-top: 3.5rem; }
+.hero-photos__arrow--prev { left: 1.5rem; }
+.hero-photos__arrow--next { right: 1.5rem; }
+.hero-photos:hover .hero-photos__arrow,
+.hero-photos__arrow:focus-visible { opacity: 1; }
+.hero-photos__arrow:hover { background: rgba(26, 26, 26, 0.45); }
+@media (hover: none) { .hero-photos__arrow { display: none; } } /* phones swipe instead */
+.hero-photos__down {
+  position: absolute;
+  right: 3rem;
+  bottom: 3rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warm-white);
+  z-index: 2;
+  animation: hero-nudge 2.4s ease-in-out 1s 3; /* a few nudges, then still */
 }
+@keyframes hero-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .hero-photos__down { animation: none; } }
+.hero-photos :focus-visible { outline: 2px solid var(--warm-white); outline-offset: 3px; }
+
+.hero--after-photos { min-height: auto; padding-top: 6rem; }
+#about { scroll-margin-top: 4rem; }
+
+@media (max-width: 768px) {
+  .hero-photos__caption { left: 1.5rem; right: 1.5rem; bottom: 6rem; }
+  .hero-photos__bar { left: 1.5rem; right: 4.5rem; bottom: 2rem; }
+  .hero-photos__down { right: 1.25rem; bottom: 2rem; }
+  .hero--after-photos { padding-top: 3.5rem; }
+  /* The portrait no longer needs to fill a phone screen: the photos above already do. */
+  .hero--after-photos .hero__image-wrap { width: 72%; }
+}
+
+/* Menu bar sits clear over the photos until the visitor scrolls past them. */
+.site-nav--over-photo {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+.site-nav--over-photo .site-nav__name { color: var(--warm-white); }
+.site-nav--over-photo .nav-toggle:not(.open) span { background: var(--warm-white); }
+@media (min-width: 769px) {
+  .site-nav--over-photo .site-nav__links a { color: rgba(250, 248, 245, 0.85); }
+  .site-nav--over-photo .site-nav__links a:hover,
+  .site-nav--over-photo .site-nav__links a.active { color: var(--warm-white); }
+  .site-nav--over-photo .site-nav__links a::after { background: var(--warm-white); }
+}
+@media (max-width: 768px) {
+  .site-nav.site-nav--over-photo { background: transparent; }
+}
+.site-nav { transition: border-color 0.4s ease, padding 0.3s ease, background 0.4s ease; }
 
 /* ---- CONTACT: photo, CVs ---- */
 
@@ -974,19 +1102,74 @@ img {
   .contact-photo { max-width: 420px; }
 }
 
-/* ---- BLOG ---- */
+/* ---- BLOG (built like the PT with V guides, 5 November 2026) ---- */
 
-.blog, .page-header--blog { max-width: 760px; }
-.blog { padding-top: 0; }
-.blog-post + .blog-post { margin-top: 5rem; padding-top: 5rem; border-top: 1px solid var(--border); }
-.blog-post { scroll-margin-top: 6rem; }
-.blog-post__title { font-family: var(--serif); font-size: 2rem; font-weight: 400; line-height: 1.2; color: var(--soft-black); }
-.blog-post__title a { color: inherit; }
-.blog-post__date { margin-top: 0.5rem; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-.blog-post__photo { margin-top: 2rem; width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; }
-.blog-post__carousel { margin-top: 2rem; }
-.blog-post__carousel .carousel { padding: 0; }
-.blog-post__body { margin-top: 2rem; font-size: 1.05rem; line-height: 1.85; }
-.blog-post__body p + p { margin-top: 1.2rem; }
-@media (max-width: 768px) { .blog-post__title { font-size: 1.6rem; } }
+.page-header--narrow, .section--narrow { max-width: 860px; }
+.section--narrow { padding-top: 0; }
 
+.post-list { list-style: none; display: grid; gap: 1.5rem; }
+.post-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.75rem;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.post-card:not(:has(.post-card__photo)) { grid-template-columns: 1fr; }
+.post-card__photo img { width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; background: var(--cream); }
+.post-card__text { display: flex; flex-direction: column; gap: 0.4rem; }
+.post-card__date, .post-date { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.post-card__title { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; line-height: 1.2; color: var(--soft-black); transition: color 0.3s ease; }
+.post-card:hover .post-card__title { color: var(--accent); }
+.post-card__summary { color: var(--charcoal); line-height: 1.7; }
+
+.post { padding: 9rem 3rem 5rem; max-width: 860px; margin: 0 auto; }
+.post-crumbs { margin-bottom: 2rem; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; }
+.post-crumbs a { color: var(--muted); }
+.post-crumbs a::before { content: "← "; }
+.post-crumbs a:hover { color: var(--charcoal); }
+.post-title { margin-top: 0.6rem; font-family: var(--serif); font-size: clamp(2.3rem, 5vw, 3.4rem); font-weight: 300; line-height: 1.1; color: var(--soft-black); }
+.post-intro { margin-top: 1.5rem; font-family: var(--serif); font-size: 1.35rem; line-height: 1.6; color: var(--charcoal); }
+.post-photo { margin-top: 3rem; }
+.post-photo img { width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; background: var(--cream); }
+.post-body { max-width: 680px; margin: 3.5rem auto 0; font-size: 1.05rem; line-height: 1.9; }
+.post-body section + section { margin-top: 3rem; }
+.post-body h2 { font-family: var(--serif); font-size: 1.8rem; font-weight: 400; line-height: 1.25; color: var(--soft-black); margin-bottom: 1rem; }
+.post-body p + p, .post-body p + ul, .post-body ul + p { margin-top: 1.2rem; }
+.post-body ul { padding-left: 1.2rem; }
+.post-body li + li { margin-top: 0.5rem; }
+.post-body li::marker { color: var(--accent); }
+.post-section-photo { margin-top: 2rem; }
+.post-section-photo img { width: 100%; height: auto; object-fit: cover; background: var(--cream); }
+.post-quote { margin-top: 3.5rem; padding-left: 1.5rem; border-left: 2px solid var(--border); }
+.post-quote blockquote { font-family: var(--serif); font-style: italic; font-size: 1.4rem; line-height: 1.6; }
+.post-quote figcaption { margin-top: 0.8rem; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.post-related { max-width: 680px; margin: 5rem auto 0; padding-top: 3rem; border-top: 1px solid var(--border); }
+.post-related .post-card { grid-template-columns: 140px 1fr; gap: 1.25rem; }
+.post-related .post-card__title { font-size: 1.3rem; }
+
+.post-preview-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 200;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  padding: 0.7rem 1.2rem;
+  background: var(--soft-black);
+  color: var(--warm-white);
+  font-size: 0.85rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+.post-preview-bar a { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .post { padding: 7rem 1.5rem 4rem; }
+  .post-intro { font-size: 1.15rem; }
+  .post-body h2 { font-size: 1.5rem; }
+  .post-card { grid-template-columns: 1fr; gap: 1rem; }
+  .post-card__title { font-size: 1.45rem; }
+  .post-related .post-card { grid-template-columns: 96px 1fr; }
+}

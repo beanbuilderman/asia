@@ -20,7 +20,7 @@ export function Photo({
   ratio?: [number, number];
   fallbackAlt?: string;
 }) {
-  const cls = [className, image.focus === "top" ? "img-top" : ""].filter(Boolean).join(" ") || undefined;
+  const cls = [className, image.focus !== "center" ? `img-${image.focus}` : ""].filter(Boolean).join(" ") || undefined;
   return (
     <Image
       src={image.url}

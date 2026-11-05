@@ -16,10 +16,11 @@ const optional = (max: number) => z.string().trim().max(max, `Keep this under ${
 /** Photos from the original site, uploads stored locally in development, or uploads in Vercel Blob. */
 export const IMAGE_URL = /^(\/images\/[^/?#]+|\/uploads\/[\w.-]+|https:\/\/[\w-]+\.public\.blob\.vercel-storage\.com\/[\w./-]+)$/;
 
-const image = z.object({
+export const image = z.object({
   url: z.string().regex(IMAGE_URL, "One of the photos did not upload properly. Remove it and add it again."),
   alt: optional(160),
-  focus: z.enum(["center", "top"]).default("center"),
+  /** Which part of the photo stays in view when it is cropped (phones crop wide photos the most). */
+  focus: z.enum(["center", "top", "left", "right"]).default("center"),
 });
 export type SiteImage = z.infer<typeof image>;
 
@@ -78,19 +79,6 @@ export const contentSchema = z.object({
       .max(4)
       .default(() => structuredClone(CVS)),
     links: z.array(z.object({ label: short(40), url: httpsUrl })).max(8),
-  }),
-  blog: z.object({
-    heading: short(60),
-    posts: z
-      .array(
-        z.object({
-          title: short(160),
-          date: optional(60),
-          photos: z.array(image).max(10, "A post can have up to 10 photos"),
-          body: long(20000),
-        }),
-      )
-      .max(200),
   }),
 });
 
@@ -157,32 +145,6 @@ function refreshContent() {
   } catch {
     // Outside a Server Action (tests, scripts): nothing cached to refresh.
   }
-}
-
-/** Web address for a blog post title, e.g. "My first week at Birkbeck!" becomes "my-first-week-at-birkbeck". */
-export function slugify(title: string): string {
-  return (
-    title
-      .replace(/ł/g, "l")
-      .replace(/Ł/g, "L")
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 80) || "post"
-  );
-}
-
-/** One web address per post; two posts with the same title get -2, -3 and so on. */
-export function postSlugs(posts: { title: string }[]): string[] {
-  const seen = new Map<string, number>();
-  return posts.map((p) => {
-    const base = slugify(p.title);
-    const n = (seen.get(base) ?? 0) + 1;
-    seen.set(base, n);
-    return n === 1 ? base : `${base}-${n}`;
-  });
 }
 
 /** Splits a long text into paragraphs on blank lines. */

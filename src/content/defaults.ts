@@ -196,9 +196,4 @@ export const DEFAULT_CONTENT: SiteContent = {
       { label: "LinkedIn", url: "https://www.linkedin.com/in/joannarob/" },
     ],
   },
-
-  blog: {
-    heading: "Blog",
-    posts: [],
-  },
 };

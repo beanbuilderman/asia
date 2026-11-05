@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // End-to-end tests build into their own folder so they never clash with a running dev server.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   cacheComponents: true,
   partialPrefetching: true,
   // Photos Asia uploads in her dashboard are stored in Vercel Blob.

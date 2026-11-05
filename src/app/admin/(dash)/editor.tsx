@@ -53,7 +53,7 @@ async function shrink(file: File): Promise<File> {
   }
 }
 
-async function uploadOne(file: File): Promise<{ url?: string; error?: string }> {
+export async function uploadOne(file: File): Promise<{ url?: string; error?: string }> {
   const fd = new FormData();
   fd.set("photo", await shrink(file));
   try {
@@ -296,7 +296,8 @@ export function List({
 
 // ---------- photos ----------
 
-type Img = { url: string; alt: string; focus: "center" | "top"; _k?: string };
+type Focus = "center" | "top" | "left" | "right";
+type Img = { url: string; alt: string; focus: Focus; _k?: string };
 
 function Thumb({ url, alt }: { url: string; alt: string }) {
   return <Image src={url} alt={alt} width={256} height={160} sizes="180px" className="thumb" />;
@@ -311,13 +312,29 @@ function PhotoDetails({ path, image }: { path: Path; image: Img }) {
   );
 }
 
+const FOCUS: { value: Focus; label: string }[] = [
+  { value: "center", label: "The middle" },
+  { value: "top", label: "The top (for posters, or when heads get cut off)" },
+  { value: "left", label: "The left side" },
+  { value: "right", label: "The right side" },
+];
+
+/** Photos are cropped to fit, most of all on phones. This picks the part that stays in view. */
 function FocusToggle({ path, image }: { path: Path; image: Img }) {
   const { update } = useEditor();
+  const id = `f-${path.join("-")}-focus`;
   return (
-    <label className="check">
-      <input type="checkbox" checked={image.focus === "top"} onChange={(e) => update([...path, "focus"], e.target.checked ? "top" : "center")} />
-      Keep the top of the photo in view (for posters, or when heads get cut off)
-    </label>
+    <div className="field">
+      <label htmlFor={id}>When the photo is cropped, keep this part in view</label>
+      <select id={id} value={image.focus} onChange={(e) => update([...path, "focus"], e.target.value as Focus)}>
+        {FOCUS.map((f) => (
+          <option key={f.value} value={f.value}>
+            {f.label}
+          </option>
+        ))}
+      </select>
+      <span className="hint">Phones show only a slice of wide photos, so this matters most for the big photos at the top of your home page.</span>
+    </div>
   );
 }
 

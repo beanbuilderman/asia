@@ -8,13 +8,18 @@ export type NavLink = { href: string; label: string };
 
 const norm = (p: string) => (p.endsWith("/") ? p : `${p}/`);
 
-export function SiteNav({ name, links }: { name: string; links: NavLink[] }) {
+/** overPhoto: the home page opens on full-screen photos, so the bar is see-through until they are scrolled past. */
+export function SiteNav({ name, links, overPhoto }: { name: string; links: NavLink[]; overPhoto: boolean }) {
   const path = norm(usePathname() ?? "/");
   const [scrolled, setScrolled] = useState(false);
+  const [pastPhotos, setPastPhotos] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+      setPastPhotos(window.scrollY > window.innerHeight - 90);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -28,7 +33,7 @@ export function SiteNav({ name, links }: { name: string; links: NavLink[] }) {
   }, [open]);
 
   return (
-    <nav className={`site-nav${scrolled ? " scrolled" : ""}`} aria-label="Main">
+    <nav className={`site-nav${scrolled ? " scrolled" : ""}${overPhoto && path === "/" && !pastPhotos && !open ? " site-nav--over-photo" : ""}`} aria-label="Main">
       <Link href="/" className="site-nav__name">
         {name}
       </Link>

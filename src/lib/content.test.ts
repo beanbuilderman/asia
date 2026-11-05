@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { sql } from "@/db";
 import { migrate } from "@/db/migrate";
 import { DEFAULT_CONTENT } from "@/content/defaults";
-import { contentSchema, loadContentForEditor, mergeContent, paragraphs, postSlugs, resetSection, saveSection } from "./content";
+import { contentSchema, loadContentForEditor, mergeContent, paragraphs, resetSection, saveSection } from "./content";
 
 beforeAll(async () => {
   await sql`DROP TABLE IF EXISTS site_content, password_resets, admin_users, schema_migrations CASCADE`;
@@ -110,7 +110,7 @@ describe("saving a page", () => {
   });
 });
 
-describe("CVs and the blog", () => {
+describe("CVs", () => {
   it("accepts an uploaded PDF and refuses a CV link to another site", async () => {
     const cvs = [
       { label: "Professional CV", url: "https://abc123.public.blob.vercel-storage.com/cv/asia-joanna-rob-cv-1-1-ab12cd34.pdf" },
@@ -122,11 +122,6 @@ describe("CVs and the blog", () => {
     await expect(saveSection("contact", { ...DEFAULT_CONTENT.contact, cvs: [{ label: "CV", url: "/uploads/photo-1.jpg" }] })).rejects.toThrow();
   });
 
-  it("saves a post, and gives two posts with the same title different links", async () => {
-    await saveSection("blog", { heading: "Blog", posts: [{ title: "First week!", date: "5 November 2026", photos: [], body: "Hello." }] });
-    expect((await loadContentForEditor()).content.blog.posts).toHaveLength(1);
-    expect(postSlugs([{ title: "First week!" }, { title: "First week!" }, { title: "Żółć ćma" }])).toEqual(["first-week", "first-week-2", "zolc-cma"]);
-  });
 });
 
 describe("paragraphs", () => {
