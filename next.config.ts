@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "4mb" } },
   // The old static site used folder URLs (/productions/), keep them working.
   trailingSlash: true,
+  // Pages renamed on 5 November 2026 at Asia's request; old links and Google results still land.
+  async redirects() {
+    return [
+      { source: "/productions/", destination: "/directing/", permanent: true },
+      { source: "/teaching/", destination: "/education/", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

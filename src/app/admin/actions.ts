@@ -23,11 +23,12 @@ const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 
 /** Turns a validation problem into a sentence Asia can act on, e.g. "This cannot be empty (Production 3: title)". */
 const FIELD_NAMES: Record<string, string> = {
-  items: "Production", images: "Photo", photos: "Photo", training: "Training", testimonials: "Testimonial", experience: "Experience",
+  items: "Production", images: "Photo", photos: "Photo", testimonials: "Testimonial", experience: "Experience",
+  posts: "Post", cvs: "CV", photo: "photo", body: "text", date: "date",
   links: "Link", title: "title", meta: "details line", description: "description", name: "name", detail: "place and date",
   quote: "quote", role: "who they are", url: "link", label: "label", alt: "photo description", heading: "heading",
   subtitle: "subtitle", bio: "introduction", intro: "introduction", email: "email", text: "text", portrait: "main photo",
-  seoTitle: "Google title", seoDescription: "Google description", footer: "footer", trainingHeading: "training heading",
+  seoTitle: "Google title", seoDescription: "Google description", footer: "footer",
   experienceHeading: "experience heading",
 };
 function describe(path: PropertyKey[]): string {
@@ -156,5 +157,19 @@ export async function actUploadPhoto(fd: FormData): Promise<{ url?: string; erro
     if (e instanceof UploadError) return { error: e.message };
     console.error("[upload]", e);
     return { error: "The photo could not be uploaded. Please try again." };
+  }
+}
+
+export async function actUploadPdf(fd: FormData): Promise<{ url?: string; error?: string }> {
+  await requireSession();
+  const { storePdf, UploadError } = await import("@/lib/uploads");
+  const file = fd.get("pdf");
+  if (!(file instanceof File) || file.size === 0) return { error: "Choose a PDF first." };
+  try {
+    return { url: await storePdf(file, String(fd.get("slot") ?? "cv")) };
+  } catch (e) {
+    if (e instanceof UploadError) return { error: e.message };
+    console.error("[upload pdf]", e);
+    return { error: "The PDF could not be uploaded. Please try again." };
   }
 }

@@ -10,7 +10,7 @@ export default async function Page() {
   const { content } = await loadContentForEditor();
   return (
     <>
-      <h1>Productions</h1>
+      <h1>Directing</h1>
       <p className="muted lead">Add, change, reorder or remove productions and their photos, then press Save at the bottom.</p>
       <ProductionsForm initial={content.productions} defaults={DEFAULT_CONTENT.productions} />
     </>

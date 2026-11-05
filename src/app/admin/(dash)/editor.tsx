@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { createContext, useContext, useEffect, useRef, useState, useTransition } from "react";
-import { actResetSection, actSaveSection, actUploadPhoto, type FormState } from "../actions";
+import { actResetSection, actSaveSection, actUploadPdf, actUploadPhoto, type FormState } from "../actions";
 
 type Path = (string | number)[];
 type Obj = Record<string | number, unknown>;
@@ -453,3 +453,67 @@ export function PhotoList({ path, max, min = 0, label = "Photo" }: { path: Path;
     </div>
   );
 }
+
+// ---------- PDFs ----------
+
+/** A CV: shows the current file and lets Asia upload a new version. The new one goes live when she presses Save. */
+export function PdfField({ path, slot }: { path: Path; slot: string }) {
+  const { value, update } = useEditor();
+  const url = String(getAt(value, path) ?? "");
+  const input = useRef<HTMLInputElement>(null);
+  const setBusy = useContext(BusyCtx);
+  const [progress, setProgress] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async (file: File) => {
+    setError(null);
+    setProgress(true);
+    setBusy((n) => n + 1);
+    const fd = new FormData();
+    fd.set("pdf", file);
+    fd.set("slot", slot);
+    let r: { url?: string; error?: string };
+    try {
+      r = await actUploadPdf(fd);
+    } catch {
+      r = { error: "The upload was interrupted. Please check your connection and try again." };
+    }
+    if (r.url) update(path, r.url);
+    else setError(r.error ?? "The PDF could not be uploaded.");
+    setProgress(false);
+    setBusy((n) => n - 1);
+  };
+
+  return (
+    <div className="field">
+      <b className="small">PDF file</b>
+      <span className="row-actions" style={{ marginTop: 6 }}>
+        {url && (
+          <a className="mini-btn" href={url} target="_blank" rel="noopener">
+            Open the current PDF
+          </a>
+        )}
+        <input
+          ref={input}
+          type="file"
+          accept="application/pdf,.pdf"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (file) void run(file);
+          }}
+        />
+        <button type="button" className="mini-btn primary" onClick={() => input.current?.click()} disabled={progress}>
+          {progress ? "Uploading…" : url ? "Upload a new version" : "Upload a PDF"}
+        </button>
+      </span>
+      {error && (
+        <span className="flash bad" role="alert" style={{ display: "block" }}>
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
+

@@ -20,14 +20,24 @@ Portfolio site for Asia Joanna Rob, theatre director (asiajoannarob.com), with a
 |---|---|
 | Original wording and photos (shown until she saves a page) | `src/content/defaults.ts` |
 | What can be edited, limits, validation | `src/lib/content.ts` (`contentSchema`) |
-| Public pages | `src/app/(site)/` (`page.tsx` = About, `productions/`, `teaching/`, `contact/`) |
+| Public pages | `src/app/(site)/` (`page.tsx` = About, `directing/`, `education/`, `blog/`, `contact/`) |
+| Photos and CVs added on 5 Nov 2026 (home carousel, contact photo, CV buttons) | `src/content/added-defaults.ts`, CV PDFs in `public/cv/` |
 | Look | `src/app/(site)/site.css` (lifted from the static site; production cards are 4:3, other photos 16:10) |
 | Carousels, nav, italics | `src/components/` (`*words*` become italics via `Rich.tsx`) |
 | Dashboard editors | `src/app/admin/(dash)/forms.tsx` (fields), `editor.tsx` (lists, photo galleries, save bar) |
 | Sign in, reset, saving, uploads | `src/app/admin/actions.ts`, `src/lib/auth.ts`, `src/lib/email.ts`, `src/lib/uploads.ts`, `src/proxy.ts` |
 | Database | `migrations/000N_*.sql`, applied by `pnpm db:migrate` |
 
-Each page is one row in `site_content` (keys `site`, `about`, `productions`, `teaching`, `contact`). "Put this page back to the original" deletes the row.
+Each page is one row in `site_content` (keys `site`, `about`, `productions`, `teaching`, `contact`, `blog`). "Put this page back to the original" deletes the row.
+
+### Changes of 5 November 2026 (Asia's WhatsApp requests of 3 November)
+
+- Home: big show-photo carousel at the top (fades every 5 seconds), then About, then testimonials. Training removed (it is in her CV). Pages saved before this keep their wording and get the default carousel through `.default()` in the schema.
+- Productions is now **Directing** at `/directing/`, Teaching is now **Education** at `/education/`; the old URLs redirect (next.config.ts). The section keys and dashboard URLs stay `productions` / `teaching`. Menu labels come from each page's heading.
+- **Blog**: one page, `/blog/`, every post with its own anchor (`/blog/#post-title`). Hidden from the menu and a 404 until the first post. One page instead of `/blog/[slug]` because Cache Components refuses an empty `generateStaticParams`.
+- **Contact**: her photo, and CV buttons (Professional CV = her Directing CV, Academic CV). She replaces a CV by uploading a new PDF in the dashboard (`storePdf` in `src/lib/uploads.ts`, Blob path `cv/`). The Academic CV includes her phone number and postcode; Sonny chose to publish it as she sent it.
+- Fade-in uses `element.animate()`, not a class: React 19 reports any class or attribute change made before hydration.
+- Still to come from her: a new photo for Contact, an Instagram for photography (she can add it under Links), trimming marketing roles from Directing (her call, in the dashboard).
 
 ## Run and test
 

@@ -57,33 +57,52 @@ export function CardCarousel({ label, children }: { label: string; children: Rea
   );
 }
 
-/** Large photo carousel at the top of the Teaching page. Moves on every 5 seconds. */
-export function PhotoCarousel({ children }: { children: React.ReactNode }) {
+/**
+ * Large photo carousel. Moves on every 5 seconds and pauses while someone points at it.
+ * "page" sits at the top of the Education page and in blog posts; "hero" fills the width at the top
+ * of the home page and fades between photos.
+ */
+export function PhotoCarousel({
+  children,
+  label = "Photos",
+  variant = "page",
+}: {
+  children: React.ReactNode;
+  label?: string;
+  variant?: "page" | "hero";
+}) {
   const slides = Children.toArray(children);
   const { index, go } = useSlides(slides.length);
   const [paused, setPaused] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   usePreload(root, index);
   useEffect(() => {
-    if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const onVis = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+  useEffect(() => {
+    if (paused || hidden || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => go(index + 1), 5000);
     return () => clearInterval(t);
-  }, [paused, index, go, slides.length]);
+  }, [paused, hidden, index, go, slides.length]);
   if (slides.length === 0) return null;
+  const hero = variant === "hero";
   return (
     <div
-      className="carousel fade-in stagger-1"
+      className={hero ? "carousel carousel--hero" : "carousel fade-in stagger-1"}
       ref={root}
       aria-roledescription="carousel"
-      aria-label="Teaching photos"
+      aria-label={label}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div className="carousel__track" style={{ transform: `translateX(-${index * 100}%)` }}>
+      <div className="carousel__track" style={hero ? undefined : { transform: `translateX(-${index * 100}%)` }}>
         {slides.map((s, i) => (
-          <div className="carousel__slide" key={i} aria-hidden={i !== index}>
+          <div className={`carousel__slide${i === index ? " is-active" : ""}`} key={i} aria-hidden={i !== index}>
             {s}
           </div>
         ))}

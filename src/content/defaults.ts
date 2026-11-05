@@ -4,6 +4,7 @@
  * Words between *asterisks* are shown in italics.
  */
 import type { SiteContent } from "@/lib/content";
+import { CONTACT_PHOTO, CVS, HOME_PHOTOS } from "./added-defaults";
 
 const img = (file: string, alt: string, focus: "center" | "top" = "center") => ({ url: `/images/${file}`, alt, focus });
 
@@ -19,6 +20,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   about: {
     name: "Asia Joanna Rob",
     subtitle: "Theatre Director",
+    photos: HOME_PHOTOS,
     portrait: img("Profile 3.jpg", "Asia Joanna Rob"),
     bio: [
       "Hi! I’m Asia (pronounced Asha), a theatre director in training with multiple professional credits as an Assistant Director. I’ve recently secured a place on the MFA Directing course at Birkbeck, University of London, and I’m working towards building a career around new writing and collaborating with international artists in the UK and beyond.",
@@ -26,17 +28,6 @@ export const DEFAULT_CONTENT: SiteContent = {
       "Alongside directing, I’ve got a background in English teaching, which definitely feeds into how I approach text and communication in a room. I am very passionate about language and creating safe environments and continue to educate myself on how power dynamics shape the rehearsal process and classrooms. My mission is to continue to create safe environments for actors, creatives and my students to flourish and do their best work.",
       "Fun facts about me: I taught myself Hindi and moved to India for 3 years because of Shah Rukh Khan. I worked as a dancer, actress and a TV host. Just google *Hasmukh* on Netflix or *Comedy Circus* on Sony TV!",
     ].join("\n\n"),
-    trainingHeading: "Training",
-    training: [
-      { name: "Rinova Dance Leadership Level 1", detail: "London, March 2026" },
-      { name: "Birkbeck University Introduction to Directing", detail: "London, Sep–Dec 2025" },
-      { name: "Agata Duda-Gracz — Directing a play *‘We wsi Kamyk’*", detail: "Cracow, Nov 2025" },
-      { name: "Tamasha’s Producing Workshop: From Fringe to Mid-scale", detail: "London, Nov 2025" },
-      { name: "Soho Theatre Playwriting — *Just Shut Up!*", detail: "London, Oct 2025" },
-      { name: "Lawrence Carmichael Meisner Level 1 & 2", detail: "London, Jan–Jun 2024" },
-      { name: "Chakravyu Arts Acting Training", detail: "Oct 2018–Jun 2019" },
-      { name: "Jeff Goldberg Studio Acting Diploma", detail: "Mumbai, India, Jun 2017–Jun 2019" },
-    ],
     testimonials: [
       {
         quote:
@@ -66,7 +57,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
 
   productions: {
-    heading: "Productions",
+    heading: "Directing",
     items: [
       {
         title: "Untitled play",
@@ -167,7 +158,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
 
   teaching: {
-    heading: "Teaching",
+    heading: "Education",
     photos: [
       img("Teaching.jpg", "Teaching"),
       img("IMG-20251018-WA0005.jpg", "Group workshop"),
@@ -198,9 +189,16 @@ export const DEFAULT_CONTENT: SiteContent = {
     heading: "Contact",
     text: "Say hello! I’m looking to connect with theatre makers and educators from around the world.",
     email: "iamjoannarob@gmail.com",
+    photo: CONTACT_PHOTO,
+    cvs: CVS,
     links: [
       { label: "Instagram", url: "https://www.instagram.com/iamjoannarob/" },
       { label: "LinkedIn", url: "https://www.linkedin.com/in/joannarob/" },
     ],
+  },
+
+  blog: {
+    heading: "Blog",
+    posts: [],
   },
 };

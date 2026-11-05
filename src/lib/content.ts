@@ -7,6 +7,7 @@ import { z } from "zod";
 import { cacheLife, cacheTag, updateTag } from "next/cache";
 import { sql } from "@/db";
 import { DEFAULT_CONTENT } from "@/content/defaults";
+import { CONTACT_PHOTO, CVS, HOME_PHOTOS } from "@/content/added-defaults";
 
 const short = (max = 120) => z.string().trim().min(1, "This cannot be empty").max(max, `Keep this under ${max} characters`);
 const long = (max = 1200) => z.string().trim().min(1, "This cannot be empty").max(max, `Keep this under ${max} characters`);
@@ -21,6 +22,9 @@ const image = z.object({
   focus: z.enum(["center", "top"]).default("center"),
 });
 export type SiteImage = z.infer<typeof image>;
+
+/** PDFs: the CVs shipped with the site, uploads stored locally in development, or uploads in Vercel Blob. */
+export const PDF_URL = /^(\/cv\/[\w.-]+\.pdf|\/uploads\/[\w.-]+\.pdf|https:\/\/[\w-]+\.public\.blob\.vercel-storage\.com\/[\w./-]+\.pdf)$/;
 
 const httpsUrl = z
   .string()
@@ -38,10 +42,10 @@ export const contentSchema = z.object({
   about: z.object({
     name: short(80),
     subtitle: short(80),
+    /** The big rotating photos at the top of the home page. Older saved versions without them get the originals. */
+    photos: z.array(image).max(30, "The top of the page can have up to 30 photos").default(() => structuredClone(HOME_PHOTOS)),
     portrait: image,
     bio: long(5000),
-    trainingHeading: short(60),
-    training: z.array(z.object({ name: short(160), detail: optional(100) })).max(40),
     testimonials: z.array(z.object({ quote: long(1200), name: short(80), role: optional(200) })).max(12),
   }),
   productions: z.object({
@@ -68,7 +72,25 @@ export const contentSchema = z.object({
     heading: short(60),
     text: optional(800),
     email: z.string().trim().email("Enter a valid email address"),
+    photo: image.default(() => structuredClone(CONTACT_PHOTO)),
+    cvs: z
+      .array(z.object({ label: short(40), url: z.string().regex(PDF_URL, "One of the CVs did not upload properly. Upload it again.") }))
+      .max(4)
+      .default(() => structuredClone(CVS)),
     links: z.array(z.object({ label: short(40), url: httpsUrl })).max(8),
+  }),
+  blog: z.object({
+    heading: short(60),
+    posts: z
+      .array(
+        z.object({
+          title: short(160),
+          date: optional(60),
+          photos: z.array(image).max(10, "A post can have up to 10 photos"),
+          body: long(20000),
+        }),
+      )
+      .max(200),
   }),
 });
 
@@ -135,6 +157,32 @@ function refreshContent() {
   } catch {
     // Outside a Server Action (tests, scripts): nothing cached to refresh.
   }
+}
+
+/** Web address for a blog post title, e.g. "My first week at Birkbeck!" becomes "my-first-week-at-birkbeck". */
+export function slugify(title: string): string {
+  return (
+    title
+      .replace(/ł/g, "l")
+      .replace(/Ł/g, "L")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "post"
+  );
+}
+
+/** One web address per post; two posts with the same title get -2, -3 and so on. */
+export function postSlugs(posts: { title: string }[]): string[] {
+  const seen = new Map<string, number>();
+  return posts.map((p) => {
+    const base = slugify(p.title);
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    return n === 1 ? base : `${base}-${n}`;
+  });
 }
 
 /** Splits a long text into paragraphs on blank lines. */

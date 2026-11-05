@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getContent, paragraphs } from "@/lib/content";
 import { Rich } from "@/components/Rich";
 import { Photo } from "@/components/Photo";
-import { TestimonialsCarousel } from "@/components/Carousels";
+import { PhotoCarousel, TestimonialsCarousel } from "@/components/Carousels";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -23,10 +23,17 @@ export default async function AboutPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person).replace(/</g, "\\u003c") }} />
-      <section className="hero">
+      {about.photos.length > 0 && (
+        <PhotoCarousel label="Photos from my productions" variant="hero">
+          {about.photos.map((img, i) => (
+            <Photo key={i} image={img} sizes="100vw" ratio={[3, 2]} priority={i === 0} fallbackAlt={`Production photo ${i + 1}`} />
+          ))}
+        </PhotoCarousel>
+      )}
+      <section className={about.photos.length > 0 ? "hero hero--after-carousel" : "hero"}>
         <div className="hero__inner">
           <div className="hero__image-wrap fade-in">
-            <Photo image={about.portrait} className="hero__image" ratio={[3, 4]} sizes="(max-width: 768px) 100vw, 540px" priority fallbackAlt={about.name} />
+            <Photo image={about.portrait} className="hero__image" ratio={[3, 4]} sizes="(max-width: 768px) 100vw, 540px" priority={about.photos.length === 0} fallbackAlt={about.name} />
           </div>
           <div className="hero__text fade-in stagger-2">
             <h1>{about.name}</h1>
@@ -41,25 +48,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-
-      {about.training.length > 0 && (
-        <>
-          <div className="divider"></div>
-          <section className="section">
-            <h2 className="section__heading fade-in">{about.trainingHeading}</h2>
-            <div className="training-list fade-in stagger-1">
-              {about.training.map((t, i) => (
-                <div className="training-item" key={i}>
-                  <span className="training-item__name">
-                    <Rich text={t.name} />
-                  </span>
-                  {t.detail && <span className="training-item__detail">{t.detail}</span>}
-                </div>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
 
       {about.testimonials.length > 0 && (
         <>

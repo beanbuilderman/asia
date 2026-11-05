@@ -1,4 +1,4 @@
-/** Stores a photo Asia uploads: Vercel Blob online, the public/uploads folder locally. */
+/** Stores a photo or PDF Asia uploads: Vercel Blob online, the .uploads folder locally. */
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -26,13 +26,26 @@ export async function storePhoto(file: File, slot: string): Promise<string> {
   if (!({ jpg: isJpeg, png: isPng, webp: isWebp } as Record<string, boolean>)[ext]) {
     throw new UploadError("That file is not a valid photo.");
   }
-  const name = `site/${slot}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${ext}`;
+  return store(bytes, `site/${slot}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${ext}`, file.type);
+}
 
+/** Stores a CV. Returns its public URL. */
+export async function storePdf(file: File, slot: string): Promise<string> {
+  if (file.size === 0) throw new UploadError("That file is empty.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("That PDF is too big (over 3.8MB). Try saving it again with smaller pictures.");
+  const bytes = Buffer.from(await file.arrayBuffer());
+  if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") throw new UploadError("Please choose a PDF file. In Word or Pages, use Export or Save as PDF first.");
+  // A readable name, so the downloaded file says whose CV it is.
+  const tidy = slot.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "cv";
+  return store(bytes, `cv/asia-joanna-rob-${tidy}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.pdf`, "application/pdf");
+}
+
+async function store(bytes: Buffer, name: string, contentType: string): Promise<string> {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(name, bytes, { access: "public", contentType: file.type, addRandomSuffix: false });
+    const blob = await put(name, bytes, { access: "public", contentType, addRandomSuffix: false });
     return blob.url;
   }
-  if (process.env.VERCEL) throw new UploadError("Photo storage is not set up yet. Ask Sonny to connect it.");
+  if (process.env.VERCEL) throw new UploadError("File storage is not set up yet. Ask Sonny to connect it.");
   // Locally: kept outside public/ and served by src/app/uploads/[name]/route.ts, because the
   // production server only serves public/ files that existed when the site was built.
   const dir = LOCAL_UPLOAD_DIR;

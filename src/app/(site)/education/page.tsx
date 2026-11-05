@@ -6,7 +6,7 @@ import { PhotoCarousel } from "@/components/Carousels";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { teaching } = await getContent();
-  return { title: teaching.heading, alternates: { canonical: "/teaching/" } };
+  return { title: teaching.heading, alternates: { canonical: "/education/" } };
 }
 
 export default async function TeachingPage() {
@@ -18,9 +18,9 @@ export default async function TeachingPage() {
         <h1 className="fade-in">{teaching.heading}</h1>
       </header>
 
-      <PhotoCarousel>
+      <PhotoCarousel label={`${teaching.heading} photos`}>
         {teaching.photos.map((img, i) => (
-          <Photo key={i} image={img} sizes="(max-width: 900px) 100vw, 900px" priority={i === 0} fallbackAlt={`Teaching photo ${i + 1}`} />
+          <Photo key={i} image={img} sizes="(max-width: 900px) 100vw, 900px" priority={i === 0} fallbackAlt={`${teaching.heading} photo ${i + 1}`} />
         ))}
       </PhotoCarousel>
 

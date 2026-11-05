@@ -6,8 +6,9 @@ import { useEffect, useRef } from "react";
 
 export const PAGES = [
   { href: "/admin/about/", label: "About", site: "/" },
-  { href: "/admin/productions/", label: "Productions", site: "/productions/" },
-  { href: "/admin/teaching/", label: "Teaching", site: "/teaching/" },
+  { href: "/admin/productions/", label: "Directing", site: "/directing/" },
+  { href: "/admin/teaching/", label: "Education", site: "/education/" },
+  { href: "/admin/blog/", label: "Blog", site: "/blog/" },
   { href: "/admin/contact/", label: "Contact", site: "/contact/" },
   { href: "/admin/settings/", label: "Settings", site: "/" },
 ];

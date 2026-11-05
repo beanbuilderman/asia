@@ -10,8 +10,8 @@ export default async function Page() {
   const { content } = await loadContentForEditor();
   return (
     <>
-      <h1>Teaching</h1>
-      <p className="muted lead">Change the photos and wording on your Teaching page, then press Save at the bottom.</p>
+      <h1>Education</h1>
+      <p className="muted lead">Change the photos and wording on your Education page, then press Save at the bottom.</p>
       <TeachingForm initial={content.teaching} defaults={DEFAULT_CONTENT.teaching} />
     </>
   );

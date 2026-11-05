@@ -6,7 +6,7 @@ import { CardCarousel } from "@/components/Carousels";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { productions } = await getContent();
-  return { title: productions.heading, alternates: { canonical: "/productions/" } };
+  return { title: productions.heading, alternates: { canonical: "/directing/" } };
 }
 
 const SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px";

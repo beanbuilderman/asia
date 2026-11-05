@@ -1,7 +1,7 @@
 "use client";
 
 import type { SiteContent } from "@/lib/content";
-import { List, Panel, PhotoField, PhotoList, SectionEditor, Text } from "./editor";
+import { List, Panel, PdfField, PhotoField, PhotoList, SectionEditor, Text } from "./editor";
 
 type Props<K extends keyof SiteContent> = { initial: SiteContent[K]; defaults: SiteContent[K] };
 
@@ -11,31 +11,18 @@ const PARAGRAPHS = "Leave an empty line between paragraphs.";
 export function AboutForm({ initial, defaults }: Props<"about">) {
   return (
     <SectionEditor sectionKey="about" initial={initial} defaults={defaults} viewHref="/">
-      <Panel title="Top of the page">
+      <Panel title="Photo carousel at the top" intro="Big photos from your shows. They fill the top of your home page and change every 5 seconds.">
+        <PhotoList path={["photos"]} max={30} />
+      </Panel>
+
+      <Panel title="About you">
         <PhotoField path={["portrait"]} label="Your photo" />
         <Text path={["name"]} label="Your name (the big heading)" />
         <Text path={["subtitle"]} label="Line under your name" />
         <Text path={["bio"]} label="Your introduction" area hint={`${PARAGRAPHS} ${ITALICS}`} />
       </Panel>
 
-      <Panel title="Training">
-        <Text path={["trainingHeading"]} label="Heading" />
-        <List
-          path={["training"]}
-          label="Training"
-          max={40}
-          addLabel="Add training"
-          blank={() => ({ name: "", detail: "" })}
-          render={(i) => (
-            <div className="form-grid two">
-              <Text path={["training", i, "name"]} label="Course or teacher" hint={ITALICS} />
-              <Text path={["training", i, "detail"]} label="Place and date" />
-            </div>
-          )}
-        />
-      </Panel>
-
-      <Panel title="Testimonials" intro="These rotate under your training list. Only add quotes the person has agreed you can use.">
+      <Panel title="Testimonials" intro="These rotate under your introduction. Only add quotes the person has agreed you can use.">
         <List
           path={["testimonials"]}
           label="Testimonial"
@@ -58,9 +45,9 @@ export function AboutForm({ initial, defaults }: Props<"about">) {
 
 export function ProductionsForm({ initial, defaults }: Props<"productions">) {
   return (
-    <SectionEditor sectionKey="productions" initial={initial} defaults={defaults} viewHref="/productions/">
+    <SectionEditor sectionKey="productions" initial={initial} defaults={defaults} viewHref="/directing/">
       <Panel title="Page heading">
-        <Text path={["heading"]} label="Heading" />
+        <Text path={["heading"]} label="Heading" hint="Also the name of this page in the menu." />
       </Panel>
       <Panel
         title="Productions"
@@ -97,11 +84,11 @@ export function ProductionsForm({ initial, defaults }: Props<"productions">) {
 
 export function TeachingForm({ initial, defaults }: Props<"teaching">) {
   return (
-    <SectionEditor sectionKey="teaching" initial={initial} defaults={defaults} viewHref="/teaching/">
+    <SectionEditor sectionKey="teaching" initial={initial} defaults={defaults} viewHref="/education/">
       <Panel title="Top of the page">
-        <Text path={["heading"]} label="Heading" />
+        <Text path={["heading"]} label="Heading" hint="Also the name of this page in the menu." />
       </Panel>
-      <Panel title="Photo carousel" intro="These rotate at the top of the Teaching page every 5 seconds.">
+      <Panel title="Photo carousel" intro="These rotate at the top of the page every 5 seconds.">
         <PhotoList path={["photos"]} max={30} />
       </Panel>
       <Panel title="Introduction">
@@ -135,6 +122,27 @@ export function ContactForm({ initial, defaults }: Props<"contact">) {
         <Text path={["text"]} label="Message" area />
         <Text path={["email"]} label="Email address shown on the page" />
       </Panel>
+      <Panel title="Your photo">
+        <PhotoField path={["photo"]} label="Photo next to your contact details" />
+      </Panel>
+      <Panel
+        title="CVs"
+        intro="Each one is a button on the Contact page that opens the PDF. To update a CV, upload the new PDF and press Save: the button then opens the new one."
+      >
+        <List
+          path={["cvs"]}
+          label="CV"
+          max={4}
+          addLabel="Add a CV"
+          blank={() => ({ label: "", url: "" })}
+          render={(i) => (
+            <>
+              <Text path={["cvs", i, "label"]} label="Button text" hint="For example Professional CV" />
+              <PdfField path={["cvs", i, "url"]} slot={`cv-${i + 1}`} />
+            </>
+          )}
+        />
+      </Panel>
       <Panel title="Links" intro="For example Instagram or LinkedIn.">
         <List
           path={["links"]}
@@ -147,6 +155,47 @@ export function ContactForm({ initial, defaults }: Props<"contact">) {
               <Text path={["links", i, "label"]} label="Name shown" />
               <Text path={["links", i, "url"]} label="Link (starting with https://)" />
             </div>
+          )}
+        />
+      </Panel>
+    </SectionEditor>
+  );
+}
+
+export function BlogForm({ initial, defaults }: Props<"blog">) {
+  return (
+    <SectionEditor sectionKey="blog" initial={initial} defaults={defaults} viewHref="/blog/">
+      <Panel title="Page heading">
+        <Text path={["heading"]} label="Heading" hint="Also the name of this page in the menu." />
+      </Panel>
+      <Panel
+        title="Posts"
+        intro="The Blog page and its menu link appear once you save your first post. Posts show newest first, in this order. A new post goes at the top."
+      >
+        <List
+          path={["posts"]}
+          label="Post"
+          max={200}
+          addAt="start"
+          addLabel="Write a new post"
+          blank={() => ({
+            title: "",
+            date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+            photos: [],
+            body: "",
+          })}
+          summary={(p) => [String(p.title || "New post"), String(p.date ?? "")].filter(Boolean).join(" · ")}
+          render={(i) => (
+            <>
+              <Text path={["posts", i, "title"]} label="Title" hint={ITALICS} />
+              <Text path={["posts", i, "date"]} label="Date shown (optional)" />
+              <Text path={["posts", i, "body"]} label="Your post" area rows={14} hint={`${PARAGRAPHS} ${ITALICS}`} />
+              <b className="small">Photos (optional)</b>
+              <p className="hint" style={{ marginTop: 0 }}>
+                One photo shows above the post. Two or more become a carousel.
+              </p>
+              <PhotoList path={["posts", i, "photos"]} max={10} />
+            </>
           )}
         />
       </Panel>

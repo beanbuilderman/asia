@@ -4,16 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const LINKS = [
-  { href: "/", label: "About" },
-  { href: "/productions/", label: "Productions" },
-  { href: "/teaching/", label: "Teaching" },
-  { href: "/contact/", label: "Contact" },
-];
+export type NavLink = { href: string; label: string };
 
 const norm = (p: string) => (p.endsWith("/") ? p : `${p}/`);
 
-export function SiteNav({ name }: { name: string }) {
+export function SiteNav({ name, links }: { name: string; links: NavLink[] }) {
   const path = norm(usePathname() ?? "/");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -49,7 +44,7 @@ export function SiteNav({ name }: { name: string }) {
         <span></span>
       </button>
       <ul className={`site-nav__links${open ? " open" : ""}`} id="navLinks">
-        {LINKS.map((l) => (
+        {links.map((l) => (
           <li key={l.href}>
             <Link
               href={l.href}
