@@ -46,6 +46,8 @@ export const contentSchema = z.object({
     /** The big rotating photos at the top of the home page. Older saved versions without them get the originals. */
     photos: z.array(image).max(30, "The top of the page can have up to 30 photos").default(() => structuredClone(HOME_PHOTOS)),
     portrait: image,
+    /** Optional line under her portrait, e.g. who took it. Older saved versions get none. */
+    portraitCredit: optional(80).default(""),
     bio: long(5000),
     testimonials: z.array(z.object({ quote: long(1200), name: short(80), role: optional(200) })).max(12),
   }),
@@ -74,6 +76,8 @@ export const contentSchema = z.object({
     text: optional(800),
     email: z.string().trim().email("Enter a valid email address"),
     photo: image.default(() => structuredClone(CONTACT_PHOTO)),
+    /** Optional line under her photo, e.g. who took it. */
+    photoCredit: optional(80).default(""),
     cvs: z
       .array(z.object({ label: short(40), url: z.string().regex(PDF_URL, "One of the CVs did not upload properly. Upload it again.") }))
       .max(4)

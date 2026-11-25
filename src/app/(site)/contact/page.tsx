@@ -18,6 +18,7 @@ export default async function ContactPage() {
         <div className="contact-layout">
           <div className="contact-photo fade-in">
             <Photo image={contact.photo} className="contact-photo__image" ratio={[4, 5]} sizes="(max-width: 768px) 100vw, 420px" priority fallbackAlt="Asia Joanna Rob" />
+            {contact.photoCredit && <p className="photo-credit">{contact.photoCredit}</p>}
           </div>
           <div className="contact-content fade-in stagger-1">
             {contact.text && <p className="contact-text">{contact.text}</p>}

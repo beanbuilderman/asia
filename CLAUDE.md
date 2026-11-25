@@ -41,6 +41,11 @@ Each page is one row in `site_content` (keys `site`, `about`, `productions`, `te
 - Fade-in uses `element.animate()`, not a class: React 19 reports any class or attribute change made before hydration.
 - Still to come from her: a new photo for Contact, an Instagram for photography (she can add it under Links), trimming marketing roles from Directing (her call, in the dashboard).
 
+### Change of 25 November 2026 (Asia's WhatsApp request)
+
+- Photo credits: an optional line under her portrait on the home page (`about.portraitCredit`) and under her photo on Contact (`contact.photoCredit`). She types the whole line herself in the dashboard, e.g. "Photo by Jane Smith". Empty shows nothing. Only those two photos: Sonny felt credits on the home carousel would not look right, and she agreed.
+- Next.js bumped to 16.4.6: 16.4.4 had two moderate advisories (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8) and `next build` refused to run.
+
 ## Run and test
 
 ```bash
@@ -68,4 +73,4 @@ pnpm typecheck && pnpm lint && pnpm test
 - Online logins: `~/Projects/asia/.admin_password_online`. Change one with `pnpm admin:password` and `DATABASE_URL` set to the Neon URL.
 - Email: "forgotten password" emails send through the PT with V Brevo account (SMTP login bd21a7001@smtp-brevo.com, key stored as a sensitive Vercel value, separate key from ptwithv's). Sender: Asia <iamjoannarob@gmail.com>, verified in Brevo. Brevo shows it as iamjoannarob@12394919.brevosend.com because it is a Gmail address. Tested live on 2 November 2026: arrived in the inbox. If emails start landing in spam, authenticate asiajoannarob.com in Brevo (DNS records in Namecheap) and send from an @asiajoannarob.com address.
 
-Keep Next.js on 16.4.1 or later: 16.0.0 to 16.4.0 have critical remote code execution advisories (GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr).
+Keep Next.js on 16.4.6 or later (16.4.4 and below fail `next build` with advisories GHSA-mfr8-8qww-v76h and GHSA-vc7v-qv4w-wrv8): 16.0.0 to 16.4.0 have critical remote code execution advisories (GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr).

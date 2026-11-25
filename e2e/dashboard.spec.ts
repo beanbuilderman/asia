@@ -106,6 +106,20 @@ test("Asia chooses which part of a home photo stays in view on phones", async ({
   await expect(page.locator(".hero-photos__slide").first().locator("img")).toHaveClass(/img-left/);
 });
 
+test("Asia credits the photographer under her photos on the home and contact pages", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/");
+  await expect(page.locator(".photo-credit")).toHaveCount(0);
+  for (const [admin, site] of [["/admin/about/", "/"], ["/admin/contact/", "/contact/"]]) {
+    await page.goto(admin);
+    await page.getByLabel("Photo credit (optional)").fill("Photo by Jane Smith");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.locator(".editor-savebar .flash.ok").filter({ visible: true })).toContainText("Saved");
+    await page.goto(site);
+    await expect(page.locator(".photo-credit")).toHaveText("Photo by Jane Smith");
+  }
+});
+
 test("Asia replaces a CV by uploading a new PDF", async ({ page, request }) => {
   await signIn(page);
   await page.goto("/admin/contact/");

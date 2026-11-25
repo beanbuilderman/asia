@@ -22,6 +22,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     subtitle: "Theatre Director",
     photos: HOME_PHOTOS,
     portrait: img("Profile 3.jpg", "Asia Joanna Rob"),
+    portraitCredit: "",
     bio: [
       "Hi! I’m Asia (pronounced Asha), a theatre director in training with multiple professional credits as an Assistant Director. I’ve recently secured a place on the MFA Directing course at Birkbeck, University of London, and I’m working towards building a career around new writing and collaborating with international artists in the UK and beyond.",
       "I’ve trained and worked in the UK, India, and Poland, and it has really shaped how I view storytelling and creative collaboration. It is also where my passion for working with international actors and actors from underrepresented socioeconomic and ethnic backgrounds comes from. I’m especially interested in new writing, immersive and forum theatre, and stories about identity, belonging, and the space between people. At the heart of it, I want to make work that moves and puts the human connection first.",
@@ -190,6 +191,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     text: "Say hello! I’m looking to connect with theatre makers and educators from around the world.",
     email: "iamjoannarob@gmail.com",
     photo: CONTACT_PHOTO,
+    photoCredit: "",
     cvs: CVS,
     links: [
       { label: "Instagram", url: "https://www.instagram.com/iamjoannarob/" },

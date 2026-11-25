@@ -46,8 +46,11 @@ export default async function AboutPage() {
       )}
       <section className={hasPhotos ? "hero hero--after-photos" : "hero"} id="about">
         <div className="hero__inner">
-          <div className="hero__image-wrap fade-in">
-            <Photo image={about.portrait} className="hero__image" ratio={[3, 4]} sizes="(max-width: 768px) 100vw, 540px" priority={!hasPhotos} fallbackAlt={about.name} />
+          <div className="hero__photo fade-in">
+            <div className="hero__image-wrap">
+              <Photo image={about.portrait} className="hero__image" ratio={[3, 4]} sizes="(max-width: 768px) 100vw, 540px" priority={!hasPhotos} fallbackAlt={about.name} />
+            </div>
+            {about.portraitCredit && <p className="photo-credit">{about.portraitCredit}</p>}
           </div>
           <div className="hero__text fade-in stagger-2">
             {/* With the photos at the top, her name and role are on the first photo instead. */}

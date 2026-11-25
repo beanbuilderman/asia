@@ -17,6 +17,7 @@ export function AboutForm({ initial, defaults }: Props<"about">) {
 
       <Panel title="About you">
         <PhotoField path={["portrait"]} label="Your photo" />
+        <Text path={["portraitCredit"]} label="Photo credit (optional)" hint="Shown in small letters under the photo, for example: Photo by Jane Smith. Leave it empty to show nothing." />
         <Text path={["name"]} label="Your name (the big heading)" />
         <Text path={["subtitle"]} label="Line under your name" />
         <Text path={["bio"]} label="Your introduction" area hint={`${PARAGRAPHS} ${ITALICS}`} />
@@ -124,6 +125,7 @@ export function ContactForm({ initial, defaults }: Props<"contact">) {
       </Panel>
       <Panel title="Your photo">
         <PhotoField path={["photo"]} label="Photo next to your contact details" />
+        <Text path={["photoCredit"]} label="Photo credit (optional)" hint="Shown in small letters under the photo, for example: Photo by Jane Smith. Leave it empty to show nothing." />
       </Panel>
       <Panel
         title="CVs"

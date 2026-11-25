@@ -1052,7 +1052,7 @@ img {
   .hero-photos__down { right: 1.25rem; bottom: 2rem; }
   .hero--after-photos { padding-top: 3.5rem; }
   /* The portrait no longer needs to fill a phone screen: the photos above already do. */
-  .hero--after-photos .hero__image-wrap { width: 72%; }
+  .hero--after-photos .hero__photo { width: 72%; }
 }
 
 /* Menu bar sits clear over the photos until the visitor scrolls past them. */
@@ -1084,6 +1084,9 @@ img {
   align-items: start;
 }
 .contact-photo__image { width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover; }
+
+/* Who took the photo (Asia's request of 25 November 2026). */
+.photo-credit { margin-top: 0.7rem; font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted); }
 .contact-cvs { margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 0.8rem; }
 .cv-link {
   display: inline-block;
